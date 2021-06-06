@@ -33,7 +33,8 @@ drawBoard();
 //alert();
 setInterval(moveMonsters, 500);
 setInterval(drawBoard, 25);
-setInterval(mutate, 500);
+setInterval(mutate, 200);
+setInterval(moveGoals, 200);
 
 function touchStarted() {
     getAudioContext().resume();
@@ -67,39 +68,6 @@ function mutate() {
         }
 
     }
-}
-
-function addMonsters(numMonsters) {
-    var mx = 0;
-    var my = 0;
-    for (var m = 0; m < numMonsters; m++) {
-        do {
-            mx = randint(cols);
-            my = randint(rows);
-
-        }
-        while (board[mx][my] != 1);
-        monsterPos[m][0] = mx;
-        monsterPos[m][1] = my;
-        board[mx][my] = 4;
-    }
-}
-function addGoals(numGoals) {
-    var gx = 0;
-    var gy = 0;
-    goals = numGoals;
-    for (var g = 0; g < numGoals; g++) {
-        do {
-            gx = randint(cols);
-            gy = randint(rows);
-
-        }
-        while (board[gx][gy] != 1);
-        goalPos[g][0] = gx;
-        goalPos[g][1] = gy;
-        board[gx][gy] = 5;
-    }
-
 }
 
 function newLevel(m) {
@@ -202,10 +170,6 @@ function clear() {
 }
 
 
-function moveMonsters() {
-
-    for (var m = 0; m < monsters; m++) moveMonster(m);
-}
 
 function Create2DArray(rows) {
     var arr = [];
@@ -215,4 +179,134 @@ function Create2DArray(rows) {
     }
     return arr;
 }
+function addGoals(numGoals) {
+    var gx = 0;
+    var gy = 0;
+    goals = numGoals;
+    for (var g = 0; g < numGoals; g++) {
+        do {
+            gx = randint(cols);
+            gy = randint(rows);
+
+        }
+        while (board[gx][gy] != 1);
+        goalPos[g][0] = gx;
+        goalPos[g][1] = gy;
+        board[gx][gy] = 5;
+    }
+
+}
+
+function moveGoal(which) {
+
+    var direction = randint(4);
+    var old_x = goalPos[which][0];
+    var old_y = goalPos[which][1];
+    var new_x = old_x, new_y = old_y;
+    switch (direction) {
+
+        case 0:
+            new_y = old_y - 1;
+            break;
+        case 1:
+            new_y = old_y + 1;
+            break;
+        case 2:
+            new_x = old_x - 1;
+            break;
+        case 3:
+            new_x = old_x + 1;
+            break;
+
+    }
+    if (new_x < 0) new_x = cols - 1;
+    if (new_x > cols - 1) new_x = 0;
+    if (new_y < 0) new_y = rows - 1;
+    if (new_y > rows - 1) new_y = 0;
+    switch (board[new_x][new_y]) {
+        case 0:
+        case 2:
+        case 3:
+        case 4: 
+        case 5: new_x = old_x; new_y = old_y; break;
+    }
+    goalPos[which][0] = new_x;
+    goalPos[which][1] = new_y;
+    board[old_x][old_y] = 1;
+    board[new_x][new_y] = 5;
+}
+
+function moveGoals() {
+    for (var m = 0; m < goals; m++) moveGoal(m);
+}
+
+function moveMonster(which) {
+    var direction = randint(4);
+    var old_x = monsterPos[which][0];
+    var old_y = monsterPos[which][1];
+    var new_x = old_x, new_y = old_y;
+    switch (direction) {
+
+        case 0:
+            new_y = old_y - 1;
+            break;
+        case 1:
+            new_y = old_y + 1;
+            break;
+        case 2:
+            new_x = old_x - 1;
+            break;
+        case 3:
+            new_x = old_x + 1;
+            break;
+
+    }
+    if (new_x < 0) new_x = cols - 1;
+    if (new_x > cols - 1) new_x = 0;
+    if (new_y < 0) new_y = rows - 1;
+    if (new_y > rows - 1) new_y = 0;
+    switch (board[new_x][new_y]) {
+        case 0: playSound("siren");
+            score = 0;
+            new_x = old_x; new_y = old_y;
+            monsters = 1;
+            newLevel(1);
+            break;
+        case 1: break;
+        case 2: new_x = old_x; new_y = old_y; break;
+        case 3:
+        case 4:
+        case 5:
+            new_x = old_x; new_y = old_y;
+            break;
+    }
+    monsterPos[which][0] = new_x;
+    monsterPos[which][1] = new_y;
+    board[old_x][old_y] = 1;
+    board[new_x][new_y] = 4;
+    //draw_board();
+    //drawMonster(which);
+}
+function moveMonsters() {
+    for (var m = 0; m < monsters; m++) moveMonster(m);
+}
+
+function addMonsters(numMonsters) {
+    var mx = 0;
+    var my = 0;
+    for (var m = 0; m < numMonsters; m++) {
+        do {
+            mx = randint(cols);
+            my = randint(rows);
+
+        }
+        while (board[mx][my] != 1);
+        monsterPos[m][0] = mx;
+        monsterPos[m][1] = my;
+        board[mx][my] = 4;
+    }
+}
+
+
+
 
